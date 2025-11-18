@@ -19,6 +19,6 @@ public class Fila {
 	}
 	
 	public void pegarLixo() {
-		rua.getFirst();
+		rua.contains(Lixo);
 	}
 }

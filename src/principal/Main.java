@@ -8,14 +8,9 @@ public class Main {
 	public static void main(String[] args) {
 		//Começar a criar o lixo
 		CriadorDeLixo1 cl = new CriadorDeLixo1();
-		CriadorDeLixo2 cl2 = new CriadorDeLixo2();
-		CriadorDeLixo3 cl3 = new CriadorDeLixo3();
 		
 		
-		cl.start();
-		cl2.start();
-		cl3.start();
-		
+		cl.start();		
 		
 		//Começar a coletar o lixo
 	}
