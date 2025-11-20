@@ -3,7 +3,7 @@ package lixos;
 import java.util.Random;
 
 public enum Lixos {
-	PAPEL, PLASTICO, VIDRO, METAL, ORGANICO;
+	PAPEL, PLASTICO, VIDRO, METAL, ORGANICO, NAO_RECICLAVEL;
 	
 	public static Lixos getLixoAleatorio() {
 		Lixos[] lixos = Lixos.values();
