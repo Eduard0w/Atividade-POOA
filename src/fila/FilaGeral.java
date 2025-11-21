@@ -18,11 +18,20 @@ public class FilaGeral {
 		return instance;
 	}
 	
-	public synchronized void pegarLixo(Lixos lixo) {
+	public synchronized void addLixo(Lixos lixo) {
         lixeiraGeral.add(lixo);
 	}
 
     public void getLixeira(){
+        System.out.println("Lixeira geral:");
         for (Lixos el : lixeiraGeral) System.out.print(el.toString() + " | ");
+    }
+
+    public synchronized Lixos retirarLixo(){
+        return lixeiraGeral.poll();
+    }
+
+    public synchronized Lixos verificarLixo(){
+        return lixeiraGeral.peek();
     }
 }

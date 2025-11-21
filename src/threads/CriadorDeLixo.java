@@ -11,14 +11,15 @@ public class CriadorDeLixo extends Thread{
 		while(cont < 10) {
 			try {
                 Lixos lixoGerado = Lixos.getLixoAleatorio();
-                lixeira.pegarLixo(lixoGerado);
-                System.out.println("Criando um lixo " + lixoGerado);
-				Thread.sleep(100);
+                lixeira.addLixo(lixoGerado);
+                System.out.println(Thread.currentThread().getName() + " Criando um lixo " + lixoGerado);
+				Thread.sleep(500);
 			} catch(Exception e) {
 				e.getStackTrace();
 			}
 			cont++;
 		}
+        Thread.currentThread().interrupt();
 //        System.out.println(lixeira);
 	}
 }
