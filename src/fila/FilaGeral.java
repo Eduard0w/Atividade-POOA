@@ -8,21 +8,31 @@ import java.util.Queue;
 public class FilaGeral {
 	Queue<Lixos> lixeiraGeral = new LinkedList<>();
 	private static FilaGeral instance;
-	
-	private FilaGeral() {}
-	
+
+	private FilaGeral() {
+	}
+
 	public static FilaGeral getInstance() {
-		if(instance == null) {
+		if (instance == null) {
 			instance = new FilaGeral();
 		}
 		return instance;
 	}
-	
+
 	public synchronized void pegarLixo(Lixos lixo) {
-        lixeiraGeral.add(lixo);
+		lixeiraGeral.add(lixo);
 	}
 
-    public void getLixeira(){
-        for (Lixos el : lixeiraGeral) System.out.print(el.toString() + " | ");
-    }
+	public synchronized Lixos retiraLixo() {
+		return lixeiraGeral.poll();
+	}
+
+	public synchronized boolean estaVazio() {
+		return lixeiraGeral.isEmpty();
+	}
+
+	public void getLixeira() {
+		for (Lixos el : lixeiraGeral)
+			System.out.print(el.toString() + " | ");
+	}
 }
