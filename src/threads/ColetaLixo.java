@@ -8,70 +8,79 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ColetaLixo extends Thread {
-	
-	private FilaGeral filaGeral = FilaGeral.getInstance();
-	private List<Lixos> reciclavel = new ArrayList<>();
-	private List<Lixos> naoReciclavel = new ArrayList<>();
+    
+    private FilaGeral filaGeral = FilaGeral.getInstance();
+    private List<Lixos> reciclavel = new ArrayList<>();
+    private List<Lixos> naoReciclavel = new ArrayList<>();
 
-	private boolean run = true;
+    private boolean run = true;
+    private long tempoInicioColeta;
+    private long tempoFimColeta;
+    private long tempoTotalColeta;
 
-	public synchronized void pararColeta() {
-		run = false;
-		this.interrupt();
-	}
+    public synchronized void pararColeta() {
+        run = false;
+        this.interrupt();
+    }
 
-	public void separarLixos() {
-		Lixos lixoColetado = filaGeral.retiraLixo();
-		if (lixoColetado != null) {
-			if (lixoColetado.eReciclavel()) {
-				reciclavel.add(lixoColetado);
+    public void separarLixos() {
+        Lixos lixoColetado = filaGeral.retiraLixo();
+        if (lixoColetado != null) {
+            if (lixoColetado.eReciclavel()) {
+                reciclavel.add(lixoColetado);
+                System.out.println("Coleta separou: " + lixoColetado + " RECICLAVEL");
+            } else {
+                naoReciclavel.add(lixoColetado);
+                System.out.println("Coleta separou: " + lixoColetado + " NÃO RECICLAVEL");
+            }
+        } else {
+            try {
+                Thread.sleep(1000 * 2);
+            } catch (InterruptedException e) {
+                synchronized (this) {
+                    run = false;
+                }
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 
-			} else {
-				naoReciclavel.add(lixoColetado);
-			}
-			System.out.println("Coleta separou: " + lixoColetado
-					+ (lixoColetado.eReciclavel() ? " RECICLAVEL" : " NÃO RECICLAVEL"));
-		} else {
-			try {
-				Thread.sleep(1000 * 2);
-			} catch (InterruptedException e) {
-				synchronized (this) {
-					run = false;
-				}
-				Thread.currentThread().interrupt();
-			}
-		}
-	}
+    public void mostraResultado() {
+        System.out.println("=== Analise: ===");
+        System.out.println("Coleta separou: " + reciclavel.size() + " lixos reciclaveis");
+        System.out.println("Coleta separou: " + naoReciclavel.size() + " lixos nao reciclaveis");
+        int naoColetados = filaGeral.getTamanho();
+        System.out.println("Coleta não conseguiu coletar " + naoColetados + " lixos a tempo");
+        int total = reciclavel.size() + naoReciclavel.size();
+        if (total > 0) {
+            double perc = ((double) reciclavel.size() / total) * 100;
+            String sustentavel = perc >= 50.0 ? "SUSTENTÁVEL" : "NÃO SUSTENTÁVEL";
+            System.out.println("Resultado: " + sustentavel);
+        }
+        System.out.println("Tempo total de coleta: " + tempoTotalColeta + " ms (" + (tempoTotalColeta / 1000.0) + " segundos)");
+    }
 
-	public void mostraResultado() {
-		System.out.println("=== Analise: ===");
-		System.out.println("Coleta separou: " + reciclavel.size() + " lixos reciclaveis");
-		System.out.println("Coleta separou: " + naoReciclavel.size() + " lixos nao reciclaveis");
-	    int naoColetados = filaGeral.getTamanho();
-		System.out.println("Coleta não conseguiu coletar " + naoColetados + " lixos a tempo");
-		int total = reciclavel.size() + naoReciclavel.size();
-		if (total > 0) {
-			double perc = ((double) reciclavel.size() / total) * 100;
-			String sustentavel = perc >= 50.0 ? "SUSTENTÁVEL" : "NÃO SUSTENTÁVEL";
-			System.out.println("Resultado: " + sustentavel);
-		}
-	}
-
-	@Override
-	public void run() {
-		while (!Temporizador.acabou()) {
-			try {
-				separarLixos();
-				Thread.sleep(500);
-				if (filaGeral.estaVazio()) {
-					System.out.println("Não há mais lixos. Finalizando a coleta");
-					break;
-				}
-			} catch (Exception e) {
-				e.getStackTrace();
-			}
-		}
-		System.out.println("Tempo do programa expirou. Finalizando a Coleta de Lixo - " + Thread.currentThread().getName());
-		mostraResultado();
-	}
+    @Override
+    public void run() {
+        tempoInicioColeta = System.currentTimeMillis();
+        
+        while (!Temporizador.acabou()) {
+            try {
+                separarLixos();
+                Thread.sleep(500);
+                if (filaGeral.estaVazio()) {
+                    System.out.println("Não há mais lixos. Finalizando a coleta");
+                    break;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        tempoFimColeta = System.currentTimeMillis();
+        tempoTotalColeta = tempoFimColeta - tempoInicioColeta;
+        
+        System.out.println("Tempo do programa expirou. Finalizando a Coleta de Lixo - " + Thread.currentThread().getName());
+        mostraResultado();
+    }
 }
