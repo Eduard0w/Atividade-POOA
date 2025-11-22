@@ -35,4 +35,8 @@ public class FilaGeral {
 		for (Lixos el : lixeiraGeral)
 			System.out.print(el.toString() + " | ");
 	}
+	
+	public synchronized int getTamanho() {
+	    return lixeiraGeral.size();
+	}
 }

@@ -2,11 +2,13 @@ package threads;
 
 import fila.FilaGeral;
 import lixos.Lixos;
+import util.Temporizador;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ColetaLixo extends Thread {
+	
 	private FilaGeral filaGeral = FilaGeral.getInstance();
 	private List<Lixos> reciclavel = new ArrayList<>();
 	private List<Lixos> naoReciclavel = new ArrayList<>();
@@ -42,9 +44,11 @@ public class ColetaLixo extends Thread {
 	}
 
 	public void mostraResultado() {
-		System.out.println("Analise:");
+		System.out.println("=== Analise: ===");
 		System.out.println("Coleta separou: " + reciclavel.size() + " lixos reciclaveis");
 		System.out.println("Coleta separou: " + naoReciclavel.size() + " lixos nao reciclaveis");
+	    int naoColetados = filaGeral.getTamanho();
+		System.out.println("Coleta não conseguiu coletar " + naoColetados + " lixos a tempo");
 		int total = reciclavel.size() + naoReciclavel.size();
 		if (total > 0) {
 			double perc = ((double) reciclavel.size() / total) * 100;
@@ -55,18 +59,19 @@ public class ColetaLixo extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!Temporizador.acabou()) {
 			try {
 				separarLixos();
-				Thread.sleep(1000);
+				Thread.sleep(500);
 				if (filaGeral.estaVazio()) {
-					System.out.println("Coleta terminou");
-					mostraResultado();
+					System.out.println("Não há mais lixos. Finalizando a coleta");
 					break;
 				}
 			} catch (Exception e) {
 				e.getStackTrace();
 			}
 		}
+		System.out.println("Tempo do programa expirou. Finalizando a Coleta de Lixo - " + Thread.currentThread().getName());
+		mostraResultado();
 	}
 }
