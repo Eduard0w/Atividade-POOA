@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ColetaLixo extends Thread {
-    
+
     private FilaGeral filaGeral = FilaGeral.getInstance();
     private List<Lixos> reciclavel = new ArrayList<>();
     private List<Lixos> naoReciclavel = new ArrayList<>();
@@ -28,10 +28,10 @@ public class ColetaLixo extends Thread {
         if (lixoColetado != null) {
             if (lixoColetado.eReciclavel()) {
                 reciclavel.add(lixoColetado);
-                System.out.println("Coleta separou: " + lixoColetado + " RECICLAVEL");
+                System.out.println("Coleta separou: " + lixoColetado + " para a lista reciclável");
             } else {
                 naoReciclavel.add(lixoColetado);
-                System.out.println("Coleta separou: " + lixoColetado + " NÃO RECICLAVEL");
+                System.out.println("Coleta separou: " + lixoColetado + " para a lista não reciclável");
             }
         } else {
             try {
@@ -49,12 +49,13 @@ public class ColetaLixo extends Thread {
         System.out.println("=== Analise: ===");
         System.out.println("Coleta separou: " + reciclavel.size() + " lixos reciclaveis");
         System.out.println("Coleta separou: " + naoReciclavel.size() + " lixos nao reciclaveis");
+        int coletados = reciclavel.size() + naoReciclavel.size();
         int naoColetados = filaGeral.getTamanho();
-        System.out.println("Coleta não conseguiu coletar " + naoColetados + " lixos a tempo");
-        int total = reciclavel.size() + naoReciclavel.size();
+        System.out.println("Lixo restante na fila geral: " + naoColetados);
+        int total = coletados + naoColetados;
         if (total > 0) {
-            double perc = ((double) reciclavel.size() / total) * 100;
-            String sustentavel = perc >= 50.0 ? "SUSTENTÁVEL" : "NÃO SUSTENTÁVEL";
+            double perc = ((double) coletados / total) * 100;
+            String sustentavel = perc >= 50.0 ? "SUSTENTÁVEL (maioria foi coletada)" : "NÃO SUSTENTÁVEL (maioria não foi coletada)";
             System.out.println("Resultado: " + sustentavel);
         }
         System.out.println("Tempo total de coleta: " + tempoTotalColeta + " ms (" + (tempoTotalColeta / 1000.0) + " segundos)");
@@ -63,7 +64,7 @@ public class ColetaLixo extends Thread {
     @Override
     public void run() {
         tempoInicioColeta = System.currentTimeMillis();
-        
+
         while (!Temporizador.acabou()) {
             try {
                 separarLixos();
@@ -76,10 +77,10 @@ public class ColetaLixo extends Thread {
                 e.printStackTrace();
             }
         }
-        
+
         tempoFimColeta = System.currentTimeMillis();
         tempoTotalColeta = tempoFimColeta - tempoInicioColeta;
-        
+
         System.out.println("Tempo do programa expirou. Finalizando a Coleta de Lixo - " + Thread.currentThread().getName());
         mostraResultado();
     }
